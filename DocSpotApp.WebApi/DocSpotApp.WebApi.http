@@ -1,0 +1,6 @@
+@DocSpotApp.WebApi_HostAddress = http://localhost:5142
+
+GET {{DocSpotApp.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

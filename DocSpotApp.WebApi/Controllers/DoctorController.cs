@@ -55,7 +55,7 @@ namespace DocSpotApp.WebApi.Controllers
         }
 
         [HttpPut]
-        [Route("edit/{id}")]
+        [Route("edit")]
         //[Authorize(Roles = "Admin, Doctor")]
         public async Task<IActionResult> Edit([FromBody] DoctorVM model)
         {

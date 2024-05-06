@@ -55,6 +55,8 @@ namespace DocSpotApp.Repository.DAL.Repositories
         public async Task<List<DoctorVM>> GetDoctorssAsync()
         {
             var doctors = new List<DoctorVM>();
+            var departments = _docSpotDBContext.Departments;
+            var hospitals = _docSpotDBContext.Hospitals;
 
             var Role = await _roleManager.FindByNameAsync("Doctor");
             if (Role == null)
@@ -77,6 +79,9 @@ namespace DocSpotApp.Repository.DAL.Repositories
                 DepartmentId = user.DepartmentId,
                 Fees = user.Fees,
                 HospitalId = user.HospitalId,
+                DepartmentName = departments.First(x => x.Id == user.DepartmentId).Name,
+                HospitalName = hospitals.First(x => x.Id == user.HospitalId).Name,
+
             }));
 
             return doctors;

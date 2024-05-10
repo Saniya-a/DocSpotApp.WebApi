@@ -16,6 +16,7 @@ namespace DocSpotApp.Repository.DAL.Interfaces
         Task<ApplicationUser> GetByIdAsync(string id);
         Task<bool> UpdateAsync(ApplicationUser user);
         Task<bool> DeleteAsync(string userId);
+        Task<List<DoctorVM>> GetDoctorListAsync(int hospitalId, int deptId);
 
     }
 }

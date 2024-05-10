@@ -18,7 +18,7 @@ namespace DocSpotApp.WebApi.Controllers
         {
             _repository = repository;
         }
-        //[Authorize(Roles = "Patient")]
+        [Authorize(Roles = "Patient")]
         [HttpGet]
         [Route("patient-appointments/{patientId}")]
         public async Task<ActionResult<List<AppointmentVM>>> GetAppointmentsByPatientId(string patientId)
@@ -34,9 +34,9 @@ namespace DocSpotApp.WebApi.Controllers
             }
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
-        [Route("appointments/get-all")]
+        [Route("get-all")]
         public async Task<ActionResult<List<AppointmentVM>>> GetAllAppointments()
         {
             try
@@ -53,7 +53,7 @@ namespace DocSpotApp.WebApi.Controllers
 
         [HttpGet]
         [Route("doctor-appointments/{doctorId}")]
-        //[Authorize(Roles = "Doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<ActionResult<List<AppointmentVM>>> GetAppointmentsByDoctorId(string doctorId)
         {
             try
@@ -67,9 +67,9 @@ namespace DocSpotApp.WebApi.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpGet]
         [Route("approve/{appointmentId}")]
-        //[Authorize(Roles = "Doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<ActionResult<Response>> ApproveAppointment(int appointmentId)
         {
             try
@@ -83,9 +83,9 @@ namespace DocSpotApp.WebApi.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpGet]
         [Route("reject/{appointmentId}")]
-        //[Authorize(Roles = "Doctor")]
+        [Authorize(Roles = "Doctor")]
         public async Task<ActionResult<Response>> RejectAppointment(int appointmentId)
         {
             try
@@ -101,7 +101,7 @@ namespace DocSpotApp.WebApi.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult<AppointmentVM>> GetAppointmentById(int id)
         {
             try
@@ -117,7 +117,7 @@ namespace DocSpotApp.WebApi.Controllers
 
         [Authorize(Roles = "Patient")]
         [HttpPost]
-        //[Route("add")]
+        [Route("add")]
         public async Task<ActionResult<Response>> AddAppointment([FromBody] AppointmentVM appointment)
         {
             try
@@ -133,7 +133,7 @@ namespace DocSpotApp.WebApi.Controllers
 
         [Authorize(Roles = "Patient")]
         [HttpPut]
-        //[Route("update")]
+        [Route("update")]
         public async Task<ActionResult<Response>> UpdateAppointment([FromBody] AppointmentVM appointment)
         {
             try

@@ -43,6 +43,7 @@ namespace DocSpotApp.WebApi.Controllers
                 var authClaims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim("UserId", user.Id),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
@@ -65,7 +66,8 @@ namespace DocSpotApp.WebApi.Controllers
                 {
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
                     RefreshToken = refreshToken,
-                    Expiration = token.ValidTo
+                    Expiration = token.ValidTo,
+                    UserRole = userRoles[0],
                 });
             }
             return Unauthorized();
@@ -231,9 +233,11 @@ namespace DocSpotApp.WebApi.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("revoke/{username}")]
-        public async Task<IActionResult> Revoke(string username)
+        [Route("revoke")]
+        public async Task<IActionResult> Revoke()
         {
+            var username = User.Identity.Name;
+
             var user = await _userManager.FindByNameAsync(username);
             if (user == null) return BadRequest("Invalid user name");
 
@@ -284,21 +288,29 @@ namespace DocSpotApp.WebApi.Controllers
 
         private ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
         {
-            var tokenValidationParameters = new TokenValidationParameters
+            try
             {
-                ValidateAudience = false,
-                ValidateIssuer = false,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
-                ValidateLifetime = false
-            };
+                var tokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
+                    ValidateLifetime = false
+                };
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new SecurityTokenException("Invalid token");
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+                if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                    throw new SecurityTokenException("Invalid token");
 
-            return principal;
+                return principal;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
 
         }
     }

@@ -11,7 +11,7 @@ namespace DocSpotApp.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    
     public class DepartmentController : ControllerBase
     {
         IGenericRepository<Department> _repository;
@@ -20,7 +20,7 @@ namespace DocSpotApp.WebApi.Controllers
             _repository = repository;
         }
 
-
+        [Authorize]
         [HttpGet]
         [Route("get-all")]
         public async Task<ActionResult<List<Department>>> GetAll()
@@ -41,6 +41,7 @@ namespace DocSpotApp.WebApi.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet]
         [Route("get")]
         public async Task<ActionResult<Department>> GetById(int id)
@@ -57,7 +58,7 @@ namespace DocSpotApp.WebApi.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Admin, Doctor")]
         [HttpPost]
         [Route("add-department")]
         public async Task<IActionResult> Add([FromBody] DepartmentVM model)
@@ -77,6 +78,7 @@ namespace DocSpotApp.WebApi.Controllers
             return Ok(new Response { Status = "Success", Message = "Department created successfully!" });
         }
 
+        [Authorize(Roles = "Admin, Doctor")]
         [HttpPut]
         [Route("edit-department")]
         public async Task<IActionResult> Edit([FromBody] DepartmentVM model)
@@ -94,6 +96,7 @@ namespace DocSpotApp.WebApi.Controllers
             return Ok(new Response { Status = "Success", Message = "Department updated successfully!" });
         }
 
+        [Authorize(Roles = "Admin, Doctor")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

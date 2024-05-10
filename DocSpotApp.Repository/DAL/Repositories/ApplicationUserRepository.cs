@@ -2,6 +2,7 @@
 using DocSpotApp.Repository.DAL.Interfaces;
 using DocSpotApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -87,18 +88,66 @@ namespace DocSpotApp.Repository.DAL.Repositories
             return doctors;
         }
 
+       public async Task<List<DoctorVM>> GetDoctorListAsync(int hospitalId, int deptId)
+{
+    var doctors = new List<DoctorVM>();
+    var departments = _docSpotDBContext.Departments;
+    var hospitals = _docSpotDBContext.Hospitals;
+
+    var Role = await _roleManager.FindByNameAsync("Doctor");
+    if (Role == null)
+    {
+        return doctors;
+    }
+
+    var usersInRole = await _userManager.GetUsersInRoleAsync(Role.Name);
+
+    doctors.AddRange(usersInRole
+        .Where(user => user.HospitalId == hospitalId && user.DepartmentId == deptId)
+        .Select(user => new DoctorVM
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Address = user.Address,
+            Username = user.UserName,
+            DOB = user.DOB,
+            Email = user.Email,
+            Mobile = user.PhoneNumber,
+            DepartmentId = user.DepartmentId,
+            Fees = user.Fees,
+            HospitalId = user.HospitalId,
+            DepartmentName = departments.FirstOrDefault(x => x.Id == user.DepartmentId)?.Name,
+            HospitalName = hospitals.FirstOrDefault(x => x.Id == user.HospitalId)?.Name
+        }));
+
+    return doctors;
+}
+
         public async Task<ApplicationUser> GetByIdAsync(string id)
         {
             return await _userManager.FindByIdAsync(id);
         }
 
-        public async Task<bool> UpdateAsync(ApplicationUser user)
+        public async Task<bool> UpdateAsync(ApplicationUser model)
         {
-            _docSpotDBContext.Entry(user).State = EntityState.Detached;
+            var user = await _userManager.FindByIdAsync(model.Id) ?? throw new KeyNotFoundException("User not found, try again later");
+
+            user.Email = model.Email;
+            user.UserName = model.UserName;
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Address = model.Address;
+            user.DepartmentId = model.DepartmentId;
+            user.Fees = model.Fees;
+            user.HospitalId = model.HospitalId;
+            user.DOB = model.DOB;
             var result = await _userManager.UpdateAsync(user);
             return result.Succeeded;
         }
 
+        
         public async Task<bool> DeleteAsync(string userId)
         {
             var appointmentList = _docSpotDBContext.Appointments.Where(x => x.PatientId == userId || x.DoctorId == userId);

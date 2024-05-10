@@ -22,7 +22,7 @@ namespace DocSpotApp.WebApi.Controllers
 
         [HttpGet]
         [Route("get-all")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<PatientVM>>> GetAll()
         {
             try
@@ -40,7 +40,7 @@ namespace DocSpotApp.WebApi.Controllers
 
         [HttpGet]
         [Route("get")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<PatientVM>> GetById(string id)
         {
             try
@@ -57,7 +57,7 @@ namespace DocSpotApp.WebApi.Controllers
 
         [HttpPut]
         [Route("edit")]
-        //[Authorize(Roles = "Admin, Patient")]
+        [Authorize(Roles = "Admin, Patient")]
 
         public async Task<IActionResult> EditPatient([FromBody] PatientVM model)
         {
@@ -81,7 +81,7 @@ namespace DocSpotApp.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             var result = await _userRepository.DeleteAsync(id);

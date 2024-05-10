@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
+using System.Numerics;
 
 namespace DocSpotApp.WebApi.Controllers
 {
@@ -14,7 +16,7 @@ namespace DocSpotApp.WebApi.Controllers
     public class DoctorController : ControllerBase
     {
         IApplicationUserRepository _userRepository;
-        public DoctorController( IApplicationUserRepository userRepository )
+        public DoctorController(IApplicationUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
@@ -22,7 +24,7 @@ namespace DocSpotApp.WebApi.Controllers
 
         [HttpGet]
         [Route("get-all")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<DoctorVM>>> GetAll()
         {
             try
@@ -33,13 +35,13 @@ namespace DocSpotApp.WebApi.Controllers
             catch (Exception)
             {
 
-                return BadRequest(new Response() { Status = "Failed", Message="Some error occured while fetching departments!"});
+                return BadRequest(new Response() { Status = "Failed", Message = "Some error occured while fetching departments!" });
             }
         }
 
         [HttpGet]
         [Route("get")]
-        //[Authorize(Roles = "Admin, Doctor")]
+        [Authorize(Roles = "Admin, Doctor")]
         public async Task<ActionResult<DoctorVM>> GetById(string id)
         {
             try
@@ -56,14 +58,14 @@ namespace DocSpotApp.WebApi.Controllers
 
         [HttpPut]
         [Route("edit")]
-        //[Authorize(Roles = "Admin, Doctor")]
+        [Authorize(Roles = "Admin, Doctor")]
         public async Task<IActionResult> Edit([FromBody] DoctorVM model)
         {
             var edit = new ApplicationUser()
             {
                 Id = model.Id,
                 FirstName = model.FirstName,
-                LastName = model.LastName,  
+                LastName = model.LastName,
                 Address = model.Address,
                 DOB = model.DOB,
                 Email = model.Email,
@@ -82,7 +84,7 @@ namespace DocSpotApp.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             var result = await _userRepository.DeleteAsync(id);
@@ -91,5 +93,15 @@ namespace DocSpotApp.WebApi.Controllers
 
             return Ok(new Response { Status = "Success", Message = "Doctor deleted successfully!" });
         }
+
+        [Authorize]
+        [HttpGet]
+        [Route("get-doctorList")]
+        public async Task<ActionResult<List<DoctorVM>>> GetDoctorList(int hospitalId, int departmentId)
+        {
+            var result = await _userRepository.GetDoctorListAsync(hospitalId, departmentId);
+            return result;
+        }
+
     }
 }
